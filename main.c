@@ -270,11 +270,85 @@ int main(int argc, char** argv) {
 					printf("PC:\t 0x%04hX\n", reg[R_PC]);
 					printf("COND:\t 0x%04hX\n", reg[R_COND]);
 				} else if (!strncmp(line, "m", 1)) {
-					// todo: implement this
+					// verify that we have three chunks
+					int spaces = 0;
+					char last = 'a';
+					int consecutive = 0;
+					for (unsigned i = 0; i < strlen(line); i++) {
+						if (line[i] == ' ') {
+							spaces++;
+							if (last == ' ') {
+								consecutive = 1;
+								break; // this condition is an error already
+							}
+						}
+						last = line[i];
+					}
+
+					// must have exactly two spaces, they can't be consecutive, 
+					//	and the last character can't be a space
+					if (spaces != 2 || consecutive || line[strlen(line)-1] == ' ') {
+						printf("Invalid format for memory command; type 'help' for help\n");
+						goto end_single_step;
+					}
+
+					// split the input into three chunks
+					char* line_buffer = strdup(line); // avoid clobbering the actual line in case we want to use it
+					char* chunks[3];
+
+					chunks[0] = strtok(line_buffer, " ");
+					chunks[1] = strtok(NULL, " ");
+					chunks[2] = strtok(NULL, " ");
+
+					// from the address, remove the leading 0x, if any
+					char address[5];
+					address[4] = '\0'; // add null terminator so we can use stdlib stuff without crashing
+					if (strlen(chunks[1]) == 6) {
+						for (int i = 0; i < 4; i++) {
+							address[i] = chunks[1][i+2];
+						}
+					} else if (strlen(chunks[1]) == 4) {
+						for (int i = 0; i < 4; i++) {
+							address[i] = chunks[1][i];
+						}
+					} else {
+						printf("Unrecognized address; use format 0xA2B4 or BE1F\n");
+						goto end_single_step;
+					}
+
+					// verify that the address is valid hex (https://stackoverflow.com/a/63006498)
+					unsigned hex_count = strspn(address, "0123456789ABCDEF");
+					if (address[hex_count]) {
+						printf("Address does not appear to be valid hex; use uppercase letters\n");
+						goto end_single_step;
+					}
+
+					// use sscanf to read into a uint16_t
+					unsigned address_u;
+					sscanf(address, "%04X", &address_u);
+					uint16_t address16 = address_u;
+
+					// determine what n is after verifying that it's valid decimal
+					unsigned dec_count = strspn(chunks[2], "0123456789");
+					if (chunks[2][dec_count]) {
+						printf("Number of words does not appear to be valid decimal\n");
+						goto end_single_step;
+					}
+
+					int n;
+					sscanf(chunks[2], "%d", &n);
+
+					for (int i = 0; i < n; i++) {
+						printf("Address 0x%04hX: 0x%04hX\n", address16 + i, mem_read(address16 + i));
+					}
+
+					free(line_buffer); // avoid memory leak
 				} else {
 					printf("Unrecognized command: %s (type 'help' for help)\n", line);
+					goto end_single_step;
 				}
 
+end_single_step:
 				// don't leak the line buffer
 				linenoiseFree(line);
 				disable_input_buffering();

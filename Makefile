@@ -8,7 +8,7 @@ CC=/opt/homebrew/opt/llvm/bin/clang
 CFLAGS = -I. -O2 -g -std=gnu17 -Wall -Wextra -Wfloat-equal -Wundef 
 CFLAGS += -Wshadow -Wpointer-arith -Wcast-align -Wstrict-prototypes
 CFLAGS += -Wwrite-strings -Waggregate-return -Wcast-qual $(CCINCLUDES)
-#CFLAGS += -fsanitize=address,undefined # may impact performance slightly, significantly increases memory footprint
+#CFLAGS += -fsanitize=address,undefined # massive performance decrease (seems to be ASAN's printf wrapper) but catches bugs
 
 # macOS library stuff
 ifeq ($(UNAME_S), Darwin)
