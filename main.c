@@ -294,11 +294,11 @@ int main(int argc, char** argv) {
 				if (imm_flag) {
 					uint16_t imm5 = sign_extend(instr & 0x1F, 5);
 					reg[dr] = reg[sr1] + imm5;
-					if (state == S_STEP) printf("ADDed 0x%04hX (SR1) to 0x%04hX (SEXT(imm5)) and stored 0x%04hX (result) in 0x%04hX (DR)\n", sr1, imm5, reg[dr], dr);
+					if (state == S_STEP) printf("ADDed 0x%04hX (SR1) to 0x%04hX (SEXT(imm5)) and stored 0x%04hX (result) in 0x%04hX (DR).\n", sr1, imm5, reg[dr], dr);
 				} else {
 					uint16_t sr2 = instr & 0x7;
 					reg[dr] = reg[sr1] + reg[sr2];
-					if (state == S_STEP) printf("ADDed 0x%04hX (SR1) to 0x%04hX (SR2) and stored 0x%04hX (result) in 0x%04hX (DR)\n", sr1, sr2, reg[dr], dr);
+					if (state == S_STEP) printf("ADDed 0x%04hX (SR1) to 0x%04hX (SR2) and stored 0x%04hX (result) in 0x%04hX (DR).\n", sr1, sr2, reg[dr], dr);
 				}
 				update_flags(dr);
 			}
@@ -313,11 +313,11 @@ int main(int argc, char** argv) {
 				if (imm_flag) {
 					uint16_t imm5 = sign_extend(instr & 0x1F, 5);
 					reg[dr] = reg[sr1] & imm5;
-					if (state == S_STEP) printf("ANDed 0x%04hX (SR1) with 0x%04hX (SEXT(imm5)) and stored 0x%04hX (result) in 0x%04hX (DR)\n", sr1, imm5, reg[dr], dr);
+					if (state == S_STEP) printf("ANDed 0x%04hX (SR1) with 0x%04hX (SEXT(imm5)) and stored 0x%04hX (result) in 0x%04hX (DR).\n", sr1, imm5, reg[dr], dr);
 				} else {
 					uint16_t sr2 = instr & 0x7;
 					reg[dr] = reg[sr1] & reg[sr2];
-					if (state == S_STEP) printf("ANDed 0x%04hX (SR1) with 0x%04hX (SR2) and stored 0x%04hX (result) in 0x%04hX (DR)\n", sr1, sr2, reg[dr], dr);
+					if (state == S_STEP) printf("ANDed 0x%04hX (SR1) with 0x%04hX (SR2) and stored 0x%04hX (result) in 0x%04hX (DR).\n", sr1, sr2, reg[dr], dr);
 				}
 				update_flags(dr);
 			}
@@ -329,7 +329,7 @@ int main(int argc, char** argv) {
 				uint16_t sr = (instr >> 6) & 0x7;
 
 				reg[dr] = ~reg[sr];
-				if (state == S_STEP) printf("NOTed 0x%04hX (SR) and stored 0x%04hX (result) in 0x%04hX (DR)\n", sr, reg[dr], dr);
+				if (state == S_STEP) printf("NOTed 0x%04hX (SR) and stored 0x%04hX (result) in 0x%04hX (DR).\n", sr, reg[dr], dr);
 				update_flags(dr);
 			}
 
@@ -340,9 +340,9 @@ int main(int argc, char** argv) {
 				uint16_t cond_flag = (instr >> 9) & 0x7;
 				if (cond_flag & reg[R_COND]) {
 					reg[R_PC] += pc_offset;
-					if (state == S_STEP) printf("Took BRanch with flag 0x%04hX (n/z/p cond flag) and added 0x%04hX (SEXT(PCoffset9)) to PC\n", cond_flag, pc_offset);
+					if (state == S_STEP) printf("Took BRanch with flag 0x%04hX (n/z/p cond flag) and added 0x%04hX (SEXT(PCoffset9)) to PC.\n", cond_flag, pc_offset);
 				} else {
-					if (state == S_STEP) printf("Did not take BRanch with flag 0x%04hX (n/z/p cond flag) and offset 0x%04hX (SEXT(PCoffset9))\n", cond_flag, pc_offset);
+					if (state == S_STEP) printf("Did not take BRanch with flag 0x%04hX (n/z/p cond flag) and offset 0x%04hX (SEXT(PCoffset9)).\n", cond_flag, pc_offset);
 				}
 			}
 
@@ -352,7 +352,7 @@ int main(int argc, char** argv) {
 				// also handles the RET "instruction", which is just when the PC is loaded with the contents of R7
 				uint16_t sr = (instr >> 6) & 0x7;
 				reg[R_PC] = reg[sr];
-				if (state == S_STEP) printf("JMPed (or maybe RETed) to address at contents of 0x%04hX (BaseR)\n", sr);
+				if (state == S_STEP) printf("JMPed (or maybe RETed) to address at contents of 0x%04hX (BaseR).\n", sr);
 			}
 
 			break;
@@ -363,11 +363,11 @@ int main(int argc, char** argv) {
 				if (long_flag) {
 					uint16_t long_pc_offset = sign_extend(instr & 0x7FF, 11); // JSR
 					reg[R_PC] += long_pc_offset;
-					if (state == S_STEP) printf("JSRed to PC + 0x%04hX (SEXT(PCoffset11)) and stored incremented PC in R7\n", long_pc_offset);
+					if (state == S_STEP) printf("JSRed to PC + 0x%04hX (SEXT(PCoffset11)) and stored incremented PC in R7.\n", long_pc_offset);
 				} else {
 					uint16_t sr = (instr >> 6) & 0x7;
 					reg[R_PC] = reg[sr]; // JSRR
-					if (state == S_STEP) printf("JSRRed to address at contents of 0x%04hX (BaseR) and stored incremented PC in R7\n", sr);
+					if (state == S_STEP) printf("JSRRed to address at contents of 0x%04hX (BaseR) and stored incremented PC in R7.\n", sr);
 				}
 			}
 
@@ -377,7 +377,7 @@ int main(int argc, char** argv) {
 				uint16_t dr = (instr >> 9) & 0x7;
 				uint16_t pc_offset = sign_extend(instr & 0x1FF, 9);
 				reg[dr] = mem_read(reg[R_PC] + pc_offset);
-				if (state == S_STEP) printf("LDed contents of address PC + 0x%04hX (SEXT(PCoffset9)) into 0x%04hX (DR)\n", pc_offset, dr);
+				if (state == S_STEP) printf("LDed contents of address PC + 0x%04hX (SEXT(PCoffset9)) into 0x%04hX (DR).\n", pc_offset, dr);
 				update_flags(dr);
 			}
 
@@ -389,7 +389,7 @@ int main(int argc, char** argv) {
 				// add PC offset to current PC, look at the referenced memory location
 				//	to get the final memory location
 				reg[dr] = mem_read(mem_read(reg[R_PC] + pc_offset));
-				if (state == S_STEP) printf("LDIed contents of address at contents of address PC + 0x%04hX (SEXT(PCoffset9)) into 0x%04hX (DR)\n", pc_offset, dr);
+				if (state == S_STEP) printf("LDIed contents of address at contents of address PC + 0x%04hX (SEXT(PCoffset9)) into 0x%04hX (DR).\n", pc_offset, dr);
 				update_flags(dr);
 			}
 
@@ -400,7 +400,7 @@ int main(int argc, char** argv) {
 				uint16_t sr = (instr >> 6) & 0x7;
 				uint16_t offset = sign_extend(instr & 0x3F, 6);
 				reg[dr] = mem_read(reg[sr] + offset);
-				if (state == S_STEP) printf("LDRed contents of address at register 0x%04hX (BaseR) + 0x%04hX (SEXT(offset6)) into 0x%04hX (DR)\n", sr, offset, dr);
+				if (state == S_STEP) printf("LDRed contents of address at register 0x%04hX (BaseR) + 0x%04hX (SEXT(offset6)) into 0x%04hX (DR).\n", sr, offset, dr);
 				update_flags(dr);
 			}
 
@@ -410,7 +410,7 @@ int main(int argc, char** argv) {
 				uint16_t dr = (instr >> 9) & 0x7;
 				uint16_t pc_offset = sign_extend(instr & 0x1FF, 9);
 				reg[dr] = reg[R_PC] + pc_offset;
-				if (state == S_STEP) printf("LEAed address (not contents of addr.) PC + 0x%04hX (SEXT(PCoffset9)) into 0x%04hX (DR)\n", pc_offset, dr);
+				if (state == S_STEP) printf("LEAed address (not contents of addr.) PC + 0x%04hX (SEXT(PCoffset9)) into 0x%04hX (DR).\n", pc_offset, dr);
 				update_flags(dr);
 			}
 
@@ -420,7 +420,7 @@ int main(int argc, char** argv) {
 				uint16_t sr = (instr >> 9) & 0x7;
 				uint16_t pc_offset = sign_extend(instr & 0x1FF, 9);
 				mem_write(reg[R_PC] + pc_offset, reg[sr]);
-				if (state == S_STEP) printf("STed contents of register 0x%04hX (SR) into address PC + 0x%04hX (SEXT(PCoffset9)) = 0x%04hX\n", sr, pc_offset, reg[R_PC] + pc_offset);
+				if (state == S_STEP) printf("STed contents of register 0x%04hX (SR) into address PC + 0x%04hX (SEXT(PCoffset9)) = 0x%04hX\n.", sr, pc_offset, reg[R_PC] + pc_offset);
 			}
 
 			break;
@@ -429,7 +429,7 @@ int main(int argc, char** argv) {
 				uint16_t sr = (instr >> 9) & 0x7;
 				uint16_t pc_offset = sign_extend(instr & 0x1FF, 9);
 				mem_write(mem_read(reg[R_PC] + pc_offset), reg[sr]);
-				if (state == S_STEP) printf("STIed contents of register 0x%04hX (SR) into address at contents of address PC + 0x%04hX (SEXT(PCoffset9))\n", sr, pc_offset);
+				if (state == S_STEP) printf("STIed contents of register 0x%04hX (SR) into address at contents of address PC + 0x%04hX (SEXT(PCoffset9)).\n", sr, pc_offset);
 			}
 
 			break;
@@ -439,7 +439,7 @@ int main(int argc, char** argv) {
 				uint16_t baseR = (instr >> 6) & 0x7;
 				uint16_t offset = sign_extend(instr & 0x3F, 6);
 				mem_write(reg[baseR] + offset, reg[sr]);
-				if (state == S_STEP) printf("STRed contents of register 0x%04hX (SR) into address 0x%04hX (SEXT(offset6)) + 0x%04hX (BaseR)\n", sr, offset, baseR);
+				if (state == S_STEP) printf("STRed contents of register 0x%04hX (SR) into address 0x%04hX (SEXT(offset6)) + 0x%04hX (BaseR).\n", sr, offset, baseR);
 			}
 
 			break;
@@ -515,7 +515,7 @@ int main(int argc, char** argv) {
 					}
 				}
 			}
-			if (state == S_STEP) printf("TRAPed with vector 0x%04hX\n", instr & 0xFF);
+			if (state == S_STEP) printf("TRAPed with vector 0x%04hX.\n", instr & 0xFF);
 
 			break;
 		case OP_RES:
