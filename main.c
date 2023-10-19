@@ -565,7 +565,7 @@ end_single_step:
 					{
 						// one char per word, not one char per byte
 						uint16_t* c = memory + reg[R_R0];
-						while (*c) { // TODO: check to make sure we don't overrun the end of the memory array?
+						while (*c) {
 							putc((char) *c, stdout);
 							++c;
 						}
@@ -589,7 +589,7 @@ end_single_step:
 						// one char per byte here, so two bytes per word.
 						//	we need to swap back to big endian
 						uint16_t* c = memory + reg[R_R0];
-						while (*c) { // TODO: check this
+						while (*c) {
 							char char1 = (*c) & 0xFF;
 							putc(char1, stdout);
 							char char2 = (*c) >> 8;
