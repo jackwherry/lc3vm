@@ -190,6 +190,26 @@ int read_image(const char* image_path) {
 	return 1; // success
 }
 
+void print_changes(uint16_t* previous_memory, uint16_t* previous_reg) {
+	for (int i = 0; (unsigned) i < MEMORY_MAX; i++) {
+		if (memory[i] != previous_memory[i]) {
+			printf("Changed memory at address 0x%04hX from 0x%04hX to 0x%04hX.\n", i, previous_memory[i], memory[i]);
+		}
+	}
+
+	for (int i = 0; (unsigned) i < R_COUNT; i++) {
+		if (reg[i] != previous_reg[i]) {
+			if (i == 8) {
+				printf("Changed PC from 0x%04hX to 0x%04hX.\n", previous_reg[i], reg[i]);
+			} else if (i == 9) {
+				printf("Changed COND from 0x%04hX to 0x%04hX.\n", previous_reg[i], reg[i]);
+			} else {
+				printf("Changed register 0x%04hX from 0x%04hX to 0x%04hX.\n", i, previous_reg[i], reg[i]);
+			}
+		}
+	}
+}
+
 int main(int argc, char** argv) {
 	signal(SIGINT, handle_interrupt);
 	disable_input_buffering();
@@ -223,6 +243,11 @@ int main(int argc, char** argv) {
 	reg[R_PC] = 0x3000;
 
 	while (state) {
+		uint16_t* previous_memory = malloc(sizeof(memory));
+		memcpy(previous_memory, memory, sizeof(memory));
+		uint16_t* previous_reg = malloc(sizeof(reg));
+		memcpy(previous_reg, reg, sizeof(reg));
+
 		// fetch
 		uint16_t instr = mem_read(reg[R_PC]++);
 		uint16_t op = instr >> 12; // get first four bits
@@ -230,7 +255,7 @@ int main(int argc, char** argv) {
 		// single-step/debugger mode command line
 		if (state == S_STEP) {
 			restore_input_buffering();
-			printf("Fetched instruction from 0x%04hX, containing 0x%04hX.\n", reg[R_PC]-1, instr);
+			printf("\nFetched instruction from 0x%04hX, containing 0x%04hX.\n", reg[R_PC]-1, instr);
 
 			while (1) {
 				// get user command
@@ -274,7 +299,7 @@ int main(int argc, char** argv) {
 					int spaces = 0;
 					char last = 'a';
 					int consecutive = 0;
-					for (unsigned i = 0; i < strlen(line); i++) {
+					for (int i = 0; (unsigned) i < strlen(line); i++) {
 						if (line[i] == ' ') {
 							spaces++;
 							if (last == ' ') {
@@ -494,7 +519,7 @@ end_single_step:
 				uint16_t sr = (instr >> 9) & 0x7;
 				uint16_t pc_offset = sign_extend(instr & 0x1FF, 9);
 				mem_write(reg[R_PC] + pc_offset, reg[sr]);
-				if (state == S_STEP) printf("STed contents of register 0x%04hX (SR) into address PC + 0x%04hX (SEXT(PCoffset9)) = 0x%04hX\n.", sr, pc_offset, reg[R_PC] + pc_offset);
+				if (state == S_STEP) printf("STed contents of register 0x%04hX (SR) into address PC + 0x%04hX (SEXT(PCoffset9)) = 0x%04hX.\n", sr, pc_offset, reg[R_PC] + pc_offset);
 			}
 
 			break;
@@ -601,6 +626,10 @@ end_single_step:
 			goto end;
 			break;
 		}
+		// show changes to memory and registers caused by last instruction
+		if (state == S_STEP) print_changes(previous_memory, previous_reg);
+		free(previous_memory); // TODO: only do the allocation and free in S_STEP mode?
+		free(previous_reg); // TODO: leader-follower flip-flop for state so it can't be changed mid loop?
 	}
 
 end:
