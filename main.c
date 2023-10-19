@@ -586,6 +586,7 @@ end_single_step:
 				default:
 					{
 						printf("invalid trap vector: 0x%04hX\n", instr & 0xFF);
+						goto end;
 					}
 				}
 			}
