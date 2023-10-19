@@ -1,5 +1,6 @@
 *.o
 lc3vm
+out/
 
 ## Mac stuff
 .DS_Store

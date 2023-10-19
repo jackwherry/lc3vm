@@ -45,10 +45,11 @@ enum {
 };
 
 int state = S_STEP;
+int next_state = S_STEP; // prevent mid-loop state changes
 
 void handle_interrupt(int signal) {
 	(void) signal; // we're intentionally handling all signals the same way
-	state--;
+	next_state--;
 	if (state == 0) {
 		// this code won't run currently because linenoise handles it for us
 		restore_input_buffering();
@@ -243,10 +244,14 @@ int main(int argc, char** argv) {
 	reg[R_PC] = 0x3000;
 
 	while (state) {
-		uint16_t* previous_memory = malloc(sizeof(memory));
-		memcpy(previous_memory, memory, sizeof(memory));
-		uint16_t* previous_reg = malloc(sizeof(reg));
-		memcpy(previous_reg, reg, sizeof(reg));
+		uint16_t* previous_memory;
+		uint16_t* previous_reg;
+		if (state == S_STEP) {
+			previous_memory = malloc(sizeof(memory));
+			memcpy(previous_memory, memory, sizeof(memory));
+			previous_reg = malloc(sizeof(reg));
+			memcpy(previous_reg, reg, sizeof(reg));
+		}
 
 		// fetch
 		uint16_t instr = mem_read(reg[R_PC]++);
@@ -279,7 +284,7 @@ int main(int argc, char** argv) {
 
 					printf("\nPress ^C or ^D to exit. You can abbreviate commands with their first letters.\n");
 				} else if (!strncmp(line, "c", 1)) {
-					state++; // move from S_STEP to S_TURBO
+					next_state++; // move from S_STEP to S_TURBO
 					break;
 				} else if (!strncmp(line, "s", 1)) {
 					break;
@@ -604,7 +609,7 @@ end_single_step:
 					{
 						puts("HALT");
 						fflush(stdout);
-						state = S_OFF;
+						next_state = S_OFF;
 					}
 
 					break;
@@ -627,9 +632,12 @@ end_single_step:
 			break;
 		}
 		// show changes to memory and registers caused by last instruction
-		if (state == S_STEP) print_changes(previous_memory, previous_reg);
-		free(previous_memory); // TODO: only do the allocation and free in S_STEP mode?
-		free(previous_reg); // TODO: leader-follower flip-flop for state so it can't be changed mid loop?
+		if (state == S_STEP) {
+			print_changes(previous_memory, previous_reg);
+			free(previous_memory);
+			free(previous_reg);
+		}
+		state = next_state;
 	}
 
 end:
