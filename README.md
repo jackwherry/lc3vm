@@ -1,6 +1,9 @@
 # lc3vm
 [LC-3](https://en.wikipedia.org/wiki/Little_Computer_3) virtual machine and interactive debugger
 
+<img width="1026" alt="image" src="https://github.com/jackwherry/lc3vm/assets/17338790/4bb41f14-4464-416e-82af-05cb338e730c">
+
+
 This project emulates the LC-3 instruction set. In addition, it lets you single-step through instructions, inspect memory at any location, pause the running emulator with Ctrl-C, and more. When you step forward in the single-step mode, you'll see how each instruction was interpreted and what changes it made to the memory and registers. I used the linenoise library to support command editing with history, so you won't be frustrated by ^[[A everywhere. 
 
 ## Building
@@ -31,6 +34,8 @@ SOFTWARE.
 
 ## Acknowledgements
 ### [LC3-vm](https://github.com/justinmeiners/lc3-vm)
+Thanks for the great [walkthrough and explanations](https://www.jmeiners.com/lc3-vm/)! This is where most of my general program structure and all of my opcode implementations came from.
+```
 MIT License
 
 Copyright (c) 2022 Justin Meiners
@@ -40,8 +45,9 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+```
 ### [linenoise](https://github.com/antirez/linenoise/)
+```
 Copyright (c) 2010-2014, Salvatore Sanfilippo <antirez at gmail dot com>
 Copyright (c) 2010-2013, Pieter Noordhuis <pcnoordhuis at gmail dot com>
 
@@ -67,3 +73,4 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
 ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
